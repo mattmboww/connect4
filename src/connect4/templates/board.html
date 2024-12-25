@@ -37,9 +37,46 @@
 
 <h3 id="player_turn_front_end"></h3>
 
-<button id="myButton" onclick="reset_board()">Reset game</button>
+<button id="resetButton" onclick="reset_board()">Reset game</button>
+<button id="cancelButton" onclick="ctrl_z()">ctrl Z move</button>
+<button id="cancelButton" onclick="ctrl_y()">ctrl Y</button>
+
+
 
 <script>
+    function ctrl_z() {
+    // Show an alert when the button is clicked
+    fetch('/ctrl_z_button_clicked', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Replace the entire board
+        updateBoard(data.board);
+        updatePlayerTurn(data.player_turn)
+    })
+}
+
+function ctrl_y() {
+    // Show an alert when the button is clicked
+    fetch('/ctrl_y_button_clicked', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Replace the entire board
+        updateBoard(data.board);
+        updatePlayerTurn(data.player_turn)
+    })
+}
+
+
     function reset_board() {
     // Show an alert when the button is clicked
     fetch('/reset_button_clicked', {
@@ -54,9 +91,6 @@
         updateBoard(data.board);
         updatePlayerTurn(data.player_turn)
     })
-    .catch(error => {
-        console.error('Error during send:', error);
-    });
 }
 
 
@@ -79,7 +113,7 @@ function updateBox(row, column) {
         // Replace the entire board
         updateBoard(data.board);
         if (data.winning_player != 0) {
-            alert("Player " + data.winner + " wins!");  // Show alert with the winner
+            alert("Player " + data.winning_player + " wins!");  // Show alert with the winner
         }
         updatePlayerTurn(data.player_turn)
     })
@@ -105,7 +139,7 @@ function updatePlayerTurn(player_turn) {
 
 
 function getColorForValue(value) {
-    if (value == 3) {
+    if (value == 0) {
         return 'white'; 
     } else if (value == 1) {
         return '#FFCC00';  // orange yellow

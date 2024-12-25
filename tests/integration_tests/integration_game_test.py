@@ -10,7 +10,7 @@ def game_state():
                      player_turn = Color.YELLOW) 
     return game_state
 
-def test_Game_instanciation(game_state):
+def test_Game_instanciation():
     game = Game()
     game_states = game.game_states
     assert len(game_states) == 1
