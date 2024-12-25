@@ -2,7 +2,7 @@ import pytest
 import numpy as np
 import copy 
 
-from connect4.game import GameState, Color, NUMBER_OF_ROWS, NUMBER_OF_COLUMNS, RECQUIRED_ALIGNED_PAWNS_TO_WIN
+from connect4.game import Game, GameState, Color, NUMBER_OF_ROWS, NUMBER_OF_COLUMNS, RECQUIRED_ALIGNED_PAWNS_TO_WIN
 
 @pytest.fixture
 def game_state():
@@ -28,7 +28,7 @@ def test_get_position_of_highest_pawn(game_state):
     game_state.board[NUMBER_OF_ROWS-1,1] = Color.YELLOW
     assert game_state.get_position_of_highest_pawn(column = 1) == NUMBER_OF_ROWS-1
 
-def test_play(game_state):
+def test_play_from_game_state(game_state):
     column = 0
     game_state.play(column, player_turn = Color.YELLOW)
     assert game_state.player_turn == Color.RED
@@ -97,3 +97,22 @@ def test_check_victory(game_state):
     assert new_game_state.check_victory(player = Color.YELLOW)
     assert not new_game_state.check_victory(player = Color.RED)
 
+def test_play_from_Game():
+    game = Game()
+    game.play(column=0, player_turn=Color.YELLOW)
+    game.play(column=1, player_turn=Color.RED)
+    game.play(column=0, player_turn=Color.YELLOW)
+    game.play(column=1, player_turn=Color.RED)
+    game_states = game.game_states
+    assert len(game_states) == 5
+    current_game_state = game_states[-1]
+    assert current_game_state.board[NUMBER_OF_ROWS-1, 0] == Color.YELLOW
+    assert current_game_state.board[NUMBER_OF_ROWS-2, 0] == Color.YELLOW
+    assert current_game_state.board[NUMBER_OF_ROWS-1, 1] == Color.RED
+    assert current_game_state.board[NUMBER_OF_ROWS-2, 1] == Color.RED
+
+def test_current_game_state():
+    pass
+
+def test_add_initialized_game_state():
+    pass

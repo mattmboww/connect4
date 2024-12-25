@@ -45,7 +45,7 @@ class GameState:
         self.switch_player_turn()
         return self
     
-    def check_horizontal_victory(self: Self, i: int, j: int, player: Color): #(moving to the right)
+    def check_horizontal_victory(self: Self, i: int, j: int, player: Color) -> bool: #(moving to the right)
         for k in range(RECQUIRED_ALIGNED_PAWNS_TO_WIN):
             if j+k > NUMBER_OF_COLUMNS-1: # reached end of the board 
                 return False
@@ -53,7 +53,7 @@ class GameState:
                 return False
         return True
 
-    def check_vertical_victory(self: Self, i: int, j: int, player: Color): # (moving to the top)
+    def check_vertical_victory(self: Self, i: int, j: int, player: Color) -> bool: # (moving to the top)
         for k in range(RECQUIRED_ALIGNED_PAWNS_TO_WIN):
             if i-k < 0: # reached end of the board 
                 return False
@@ -61,7 +61,7 @@ class GameState:
                 return False
         return True
 
-    def check_diagonal_victory(self: Self, i: int, j: int, player: Color): # (moving to the top/right)
+    def check_diagonal_victory(self: Self, i: int, j: int, player: Color) -> bool: # (moving to the top/right)
         for k in range(RECQUIRED_ALIGNED_PAWNS_TO_WIN):
             if i-k > NUMBER_OF_ROWS-1 or j+k > NUMBER_OF_COLUMNS-1: # reached end of the board
                 return False
@@ -82,13 +82,29 @@ class GameState:
 
 class Game:
 
-    def __init__(self: Self, game_states: List[GameState] = []) -> None:
-        self.game_states = game_states
+    def __init__(self: Self, game_states: List[GameState] = None) -> None:
+        if game_states is None:
+            initial_game_state = GameState().initialize()
+            self.game_states = [initial_game_state]
 
     def play(self: Self, column: int, player_turn: Color) -> Self:
-        last_game_state = self.game_states[-1]
-        assert len(last_game_state) > 1
-        last_game_state = copy.deepcopy(last_game_state)
-        last_game_state.play(column, player_turn)
-        self.game_states.append(last_game_state)
+        game_states = self.game_states
+        assert len(game_states) > 0
+        current_game_state = game_states[-1]
+        current_game_state = copy.deepcopy(current_game_state)
+        current_game_state.play(column, player_turn)
+        self.game_states.append(current_game_state)
         return self
+    
+    def get_current_game_state(self: Self) -> GameState:
+        return self.game_states[-1]
+    
+    def get_current_player_turn(self: Self) -> Color:
+        return self.get_current_game_state().player_turn
+    
+    def get_current_board(self: Self) -> Color:
+        return self.get_current_game_state().board
+    
+    def add_initialized_game_state(self: Self) -> GameState:
+        self.game_states.append(GameState().initialize())
+        return self  
