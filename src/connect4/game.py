@@ -8,21 +8,21 @@ RECQUIRED_ALIGNED_PAWNS_TO_WIN = 4
 
 
 class Color(Enum):
-    RED = auto()
     YELLOW = auto()
+    RED = auto()
     EMPTY = auto()
 
 class Game:
 
-    def __init__(self: Self, board: np.ndarray, player_turn: Color) -> Self:
+    def __init__(self: Self, board: np.ndarray, player_turn: Color) -> None:
         self.board = board
         self.player_turn = player_turn
 
-    @staticmethod
-    def initialize_board() -> Self:
-        return Game(board = np.full((NUMBER_OF_ROWS, NUMBER_OF_COLUMNS), Color.EMPTY), 
-                     player_turn = Color.YELLOW)
-    
+    def initialize(self: Self) -> Self:
+        self.board = np.full((NUMBER_OF_ROWS, NUMBER_OF_COLUMNS), Color.EMPTY)
+        self.player_turn = Color.YELLOW
+        return self
+
     def switch_player_turn(self: Self) -> Self:
         self.player_turn = Color.RED if self.player_turn == Color.YELLOW else Color.YELLOW
         return self

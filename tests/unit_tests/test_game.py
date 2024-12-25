@@ -1,4 +1,3 @@
-# tests/test_board.py
 import pytest
 import numpy as np
 import copy 
@@ -11,10 +10,10 @@ def game():
                      player_turn = Color.YELLOW) 
     return game
 
-def test_initialize_board():
-    game = Game.initialize_board()
-    assert np.all(game.board == Color.EMPTY)
-    assert game.player_turn == Color.YELLOW
+def test_initialize(game):
+    initialized_game = game.initialize()
+    assert np.all(initialized_game.board[:,:] == np.full((NUMBER_OF_ROWS, NUMBER_OF_COLUMNS), Color.EMPTY))
+    assert initialized_game.player_turn == Color.YELLOW
 
 def test_switch_player_turn(game): 
     game.switch_player_turn()
