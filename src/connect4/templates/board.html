@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>6x7 Board</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 50%;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: center;
+            cursor: pointer; /* Changes cursor to indicate it's clickable */
+        }
+    </style>
+</head>
+<body>
+
+<h2>Connect4</h2>
+
+<table id="board_frontend">
+    <tbody>
+        {% for i in range(board|length) %}
+            <tr>
+                {% for j in range(board[i]|length) %}
+                    <td onclick="updateCase({{ i }}, {{ j }})">
+                        {{ board[i][j] }}
+                    </td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h3 id="player_turn_front_end"></h3>
+
+<button id="myButton" onclick="reset_board()">Reset game</button>
+
+<script>
+    function reset_board() {
+    // Show an alert when the button is clicked
+    fetch('/reset_button_clicked', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Replace the entire board
+        updateBoard(data.board);
+        updatePlayerTurn(data.player_turn)
+    })
+    .catch(error => {
+        console.error('Error during send:', error);
+    });
+}
+
+
+function updateCase(row, column) {
+    const data = {
+        column: column,
+        row: row
+    };
+
+    // Send POST request with coordinates
+    fetch('/box_clicking', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data) // Convert object to JSON
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Replace the entire board
+        updateBoard(data.board);
+        updatePlayerTurn(data.player_turn)
+    })
+    .catch(error => {
+        console.error('Error during send:', error);
+    });
+}
+
+function updateBoard(board) {
+    const table = document.getElementById('board_frontend');
+    for (let row = 0; row < board.length; row++) {
+        for (let col = 0; col < board[row].length; col++) {
+            const cell = table.rows[row].cells[col];
+            const value = board[row][col];
+            cell.textContent = '';  // Update cell with new value
+            cell.style.backgroundColor = getColorForValue(value);
+        }
+    }
+}
+
+function updatePlayerTurn(player_turn) {
+    const old_player_turn = document.getElementById('player_turn_front_end');
+    old_player_turn.textContent = "It's your turn, Player: " + player_turn;
+    old_player_turn.style.color = getColorForValue(player_turn)  
+}
+
+
+function getColorForValue(value) {
+    if (value == 3) {
+        return 'white'; 
+    } else if (value == 1) {
+        return '#FFCC00';  // orange yellow
+    } else if (value == 2) {
+        return 'red'; 
+    } 
+}
+
+window.onload = function() {
+    const initialBoard = {{ board|tojson }}; // Use Jinja to inject the board array from the backend
+    updateBoard(initialBoard); // Apply colors at the start
+    updatePlayerTurn('{{ player_turn }}');  // Apply the player's turn at the start
+};
+</script>
+
+</body>
+</html>

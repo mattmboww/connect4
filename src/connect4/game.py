@@ -14,7 +14,7 @@ class Color(Enum):
 
 class Game:
 
-    def __init__(self: Self, board: np.ndarray, player_turn: Color) -> None:
+    def __init__(self: Self, board: np.ndarray = None, player_turn: Color = None) -> None:
         self.board = board
         self.player_turn = player_turn
 
