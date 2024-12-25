@@ -1,6 +1,7 @@
 from enum import Enum, auto
 import numpy as np
-from typing import Self
+from typing import Self, List
+import copy 
 
 NUMBER_OF_ROWS = 6
 NUMBER_OF_COLUMNS = 7 
@@ -12,7 +13,8 @@ class Color(Enum):
     YELLOW = auto()
     RED = auto()
 
-class Game:
+    
+class GameState:
 
     def __init__(self: Self, board: np.ndarray = None, player_turn: Color = None) -> None:
         self.board = board
@@ -76,3 +78,17 @@ class Game:
                 if horizontal_victory or vertical_victory or diagonal_victory:
                     return True
         return False
+
+
+class Game:
+
+    def __init__(self: Self, game_states: List[GameState] = []) -> None:
+        self.game_states = game_states
+
+    def play(self: Self, column: int, player_turn: Color) -> Self:
+        last_game_state = self.game_states[-1]
+        assert len(last_game_state) > 1
+        last_game_state = copy.deepcopy(last_game_state)
+        last_game_state.play(column, player_turn)
+        self.game_states.append(last_game_state)
+        return self

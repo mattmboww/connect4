@@ -1,17 +1,17 @@
 from flask import Flask, jsonify, request, render_template
 
-from game import Game, Color
+from game import GameState, Color
 
-game = Game()
-game.initialize()
+game_state = GameState()
+game_state.initialize()
 app = Flask(__name__)
 
-def convert_game_to_json_compatible(game: Game = Game()):
-    return [[cell.value for cell in row] for row in game.board.tolist()], game.player_turn.value
+def convert_game_state_to_json_compatible(game_state: GameState = GameState()):
+    return [[cell.value for cell in row] for row in game_state.board.tolist()], game_state.player_turn.value
 
 @app.route('/')
 def index():
-    board_json_compatible, player_turn_value = convert_game_to_json_compatible(game)
+    board_json_compatible, player_turn_value = convert_game_state_to_json_compatible(game_state)
     return render_template('board.html', board=board_json_compatible, player_turn=player_turn_value)
 
 @app.route('/box_clicking', methods=['POST'])
@@ -19,10 +19,10 @@ def receive_move():
     # Assume we receive data through the POST request
     data = request.get_json()
     column = data.get('column')
-    current_player_turn = game.player_turn
-    game.play(column, player_turn=current_player_turn)
-    victory = game.check_victory(player=current_player_turn)
-    new_board_json_compatible, new_player_turn_value = convert_game_to_json_compatible(game)
+    current_player_turn = game_state.player_turn
+    game_state.play(column, player_turn=current_player_turn)
+    victory = game_state.check_victory(player=current_player_turn)
+    new_board_json_compatible, new_player_turn_value = convert_game_state_to_json_compatible(game_state)
     response = {
         'board':  new_board_json_compatible, 
         'player_turn': new_player_turn_value, 
@@ -30,23 +30,20 @@ def receive_move():
     }
     return jsonify(response)  
 
-import numpy as np
-from game import NUMBER_OF_COLUMNS, NUMBER_OF_ROWS, Color
-
 @app.route('/reset_button_clicked', methods=['POST'])
 def reset_board():
-    # global game 
-    # game = Game(board = np.full((NUMBER_OF_ROWS, NUMBER_OF_COLUMNS), Color.EMPTY), player_turn= Color.YELLOW )
-    global game
-    game = game.initialize()
-
-    board_json_compatible, player_turn_value = convert_game_to_json_compatible(game)
+    global game_state
+    game_state = game_state.initialize()
+    board_json_compatible, player_turn_value = convert_game_state_to_json_compatible(game_state)
     response = {
         'board': board_json_compatible, 
         'player_turn': player_turn_value
     }
     return jsonify(response)
 
+@app.route('/cancel_button_clicked', methods=['POST'])
+def cancel_move():
+    pass
     
 
 if __name__ == '__main__':
