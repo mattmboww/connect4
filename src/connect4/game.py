@@ -43,36 +43,36 @@ class Game:
         self.switch_player_turn()
         return self
     
-    def check_horizontal_victory(self: Self, i: int, j: int, player_color: Color): #(moving to the right)
+    def check_horizontal_victory(self: Self, i: int, j: int, player: Color): #(moving to the right)
         for k in range(RECQUIRED_ALIGNED_PAWNS_TO_WIN):
             if j+k > NUMBER_OF_COLUMNS-1: # reached end of the board 
                 return False
-            if self.board[i][j+k] != player_color: # found a different color than player's color
+            if self.board[i][j+k] != player: # found a different color than player's color
                 return False
         return True
 
-    def check_vertical_victory(self: Self, i: int, j: int, player_color: Color): # (moving to the top)
+    def check_vertical_victory(self: Self, i: int, j: int, player: Color): # (moving to the top)
         for k in range(RECQUIRED_ALIGNED_PAWNS_TO_WIN):
             if i-k < 0: # reached end of the board 
                 return False
-            if self.board[i-k][j] != player_color: # found a different color than player's color
+            if self.board[i-k][j] != player: # found a different color than player's color
                 return False
         return True
 
-    def check_diagonal_victory(self: Self, i: int, j: int, player_color: Color): # (moving to the top/right)
+    def check_diagonal_victory(self: Self, i: int, j: int, player: Color): # (moving to the top/right)
         for k in range(RECQUIRED_ALIGNED_PAWNS_TO_WIN):
             if i-k > NUMBER_OF_ROWS-1 or j+k > NUMBER_OF_COLUMNS-1: # reached end of the board
                 return False
-            if self.board[i-k][j+k] != player_color: # found a different color than player's color
+            if self.board[i-k][j+k] != player: # found a different color than player's color
                 return False
         return True
     
-    def check_victory(self: Self, player_color: Color) -> Self:
+    def check_victory(self: Self, player: Color) -> Self:
         for i in range(NUMBER_OF_ROWS):
             for j in range(NUMBER_OF_COLUMNS):
-                horizontal_victory = self.check_horizontal_victory(i, j, player_color)
-                vertical_victory = self.check_vertical_victory(i, j, player_color)
-                diagonal_victory = self.check_diagonal_victory(i, j, player_color)
+                horizontal_victory = self.check_horizontal_victory(i, j, player)
+                vertical_victory = self.check_vertical_victory(i, j, player)
+                diagonal_victory = self.check_diagonal_victory(i, j, player)
                 if horizontal_victory or vertical_victory or diagonal_victory:
                     return True
         return False

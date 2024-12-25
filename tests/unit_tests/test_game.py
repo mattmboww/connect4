@@ -42,60 +42,60 @@ def test_play(game):
 def test_check_horizontal_victory(game):
     for i in range(NUMBER_OF_ROWS):
         for j in range(NUMBER_OF_COLUMNS):
-            assert not game.check_horizontal_victory(i, j, player_color=Color.YELLOW)
-            assert not game.check_horizontal_victory(i, j, player_color=Color.RED)
+            assert not game.check_horizontal_victory(i, j, player=Color.YELLOW)
+            assert not game.check_horizontal_victory(i, j, player=Color.RED)
     for j in range(RECQUIRED_ALIGNED_PAWNS_TO_WIN):
         game.board[NUMBER_OF_ROWS-1,j] = Color.YELLOW
-    assert game.check_horizontal_victory(NUMBER_OF_ROWS-1, 0, player_color=Color.YELLOW)
-    assert not game.check_horizontal_victory(NUMBER_OF_ROWS-1, 0, player_color=Color.RED)
-    assert not game.check_horizontal_victory(NUMBER_OF_ROWS-1, 1, player_color=Color.YELLOW)
-    assert not game.check_horizontal_victory(NUMBER_OF_ROWS-1, NUMBER_OF_COLUMNS, player_color=Color.YELLOW)
+    assert game.check_horizontal_victory(NUMBER_OF_ROWS-1, 0, player=Color.YELLOW)
+    assert not game.check_horizontal_victory(NUMBER_OF_ROWS-1, 0, player=Color.RED)
+    assert not game.check_horizontal_victory(NUMBER_OF_ROWS-1, 1, player=Color.YELLOW)
+    assert not game.check_horizontal_victory(NUMBER_OF_ROWS-1, NUMBER_OF_COLUMNS, player=Color.YELLOW)
 
 def test_check_vertical_victory(game):
     game = Game(board = np.full((NUMBER_OF_ROWS, NUMBER_OF_COLUMNS), Color.EMPTY), 
                      player_turn = Color.YELLOW) 
     for i in range(NUMBER_OF_ROWS):
         for j in range(NUMBER_OF_COLUMNS):
-            assert not game.check_vertical_victory(i, j, player_color=Color.YELLOW)
-            assert not game.check_vertical_victory(i, j, player_color=Color.RED)
+            assert not game.check_vertical_victory(i, j, player=Color.YELLOW)
+            assert not game.check_vertical_victory(i, j, player=Color.RED)
     for i in range(RECQUIRED_ALIGNED_PAWNS_TO_WIN):
         game.board[NUMBER_OF_ROWS-1-i,0] = Color.YELLOW
-    assert game.check_vertical_victory(NUMBER_OF_ROWS-1, 0, player_color=Color.YELLOW)
-    assert not game.check_vertical_victory(NUMBER_OF_ROWS-1, 0, player_color=Color.RED)
-    assert not game.check_vertical_victory(NUMBER_OF_ROWS-1, 1, player_color=Color.YELLOW)
-    assert not game.check_vertical_victory(NUMBER_OF_ROWS-1, NUMBER_OF_COLUMNS-1, player_color=Color.YELLOW)
+    assert game.check_vertical_victory(NUMBER_OF_ROWS-1, 0, player=Color.YELLOW)
+    assert not game.check_vertical_victory(NUMBER_OF_ROWS-1, 0, player=Color.RED)
+    assert not game.check_vertical_victory(NUMBER_OF_ROWS-1, 1, player=Color.YELLOW)
+    assert not game.check_vertical_victory(NUMBER_OF_ROWS-1, NUMBER_OF_COLUMNS-1, player=Color.YELLOW)
 
 def test_check_diagonal_victory(game):
     for i in range(NUMBER_OF_ROWS):
         for j in range(NUMBER_OF_COLUMNS):
-            assert not game.check_diagonal_victory(i, j, player_color=Color.YELLOW)
-            assert not game.check_diagonal_victory(i, j, player_color=Color.RED)
+            assert not game.check_diagonal_victory(i, j, player=Color.YELLOW)
+            assert not game.check_diagonal_victory(i, j, player=Color.RED)
     for k in range(RECQUIRED_ALIGNED_PAWNS_TO_WIN):
         game.board[NUMBER_OF_ROWS-1-k,k] = Color.YELLOW
-    assert game.check_diagonal_victory(NUMBER_OF_ROWS-1, 0, player_color=Color.YELLOW)
-    assert not game.check_diagonal_victory(NUMBER_OF_ROWS-1, 0, player_color=Color.RED)
-    assert not game.check_diagonal_victory(NUMBER_OF_ROWS-1, 1, player_color=Color.YELLOW)
-    assert not game.check_diagonal_victory(NUMBER_OF_ROWS-1, NUMBER_OF_COLUMNS-1, player_color=Color.YELLOW)
+    assert game.check_diagonal_victory(NUMBER_OF_ROWS-1, 0, player=Color.YELLOW)
+    assert not game.check_diagonal_victory(NUMBER_OF_ROWS-1, 0, player=Color.RED)
+    assert not game.check_diagonal_victory(NUMBER_OF_ROWS-1, 1, player=Color.YELLOW)
+    assert not game.check_diagonal_victory(NUMBER_OF_ROWS-1, NUMBER_OF_COLUMNS-1, player=Color.YELLOW)
 
 def test_check_victory(game):
-    assert not game.check_victory(player_color = Color.YELLOW)
-    assert not game.check_victory(player_color = Color.RED)
+    assert not game.check_victory(player = Color.YELLOW)
+    assert not game.check_victory(player = Color.RED)
 
     new_game = copy.deepcopy(game)
     for j in range(RECQUIRED_ALIGNED_PAWNS_TO_WIN):
         new_game.board[NUMBER_OF_ROWS-1,j] = Color.YELLOW
-    assert new_game.check_victory(player_color = Color.YELLOW)
-    assert not new_game.check_victory(player_color = Color.RED)
+    assert new_game.check_victory(player = Color.YELLOW)
+    assert not new_game.check_victory(player = Color.RED)
 
     new_game = copy.deepcopy(game)
     for i in range(RECQUIRED_ALIGNED_PAWNS_TO_WIN):
         new_game.board[NUMBER_OF_ROWS-1-i,0] = Color.YELLOW
-    assert new_game.check_victory(player_color = Color.YELLOW)
-    assert not new_game.check_victory(player_color = Color.RED)
+    assert new_game.check_victory(player = Color.YELLOW)
+    assert not new_game.check_victory(player = Color.RED)
 
     new_game = copy.deepcopy(game)
     for k in range(RECQUIRED_ALIGNED_PAWNS_TO_WIN):
         new_game.board[NUMBER_OF_ROWS-1-k,k] = Color.YELLOW
-    assert new_game.check_victory(player_color = Color.YELLOW)
-    assert not new_game.check_victory(player_color = Color.RED)
+    assert new_game.check_victory(player = Color.YELLOW)
+    assert not new_game.check_victory(player = Color.RED)
 
