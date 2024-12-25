@@ -3,17 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>6x7 Board</title>
+    <title>Connect4</title>
     <style>
-        table {
-            border-collapse: collapse;
-            width: 50%;
-        }
-        th, td {
-            border: 1px solid black;
-            padding: 8px;
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f2f2f2; /* Couleur de fond agréable */
             text-align: center;
-            cursor: pointer; /* Changes cursor to indicate it's clickable */
+            margin: 0;
+            padding: 0;
+        }
+
+        h2 {
+            color: #333;
+            font-size: 2rem;
+            margin-top: 20px;
+        }
+
+        #board_frontend {
+            margin: 20px auto;
+            width: 80%;
+            border: 3px solid #333;
+            border-radius: 10px;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            height: 100%;
+            border-collapse: collapse;
+            background-color: #333;
+        }
+
+        td {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin: 5px;
+            cursor: pointer;
+            transition: transform 0.3s ease-in-out, background-color 0.3s ease-in-out;
+        }
+
+        td:hover {
+            transform: scale(1.1); /* Agrandissement du cercle au survol */
+        }
+
+        td:active {
+            transform: scale(0.95); /* Effet de "clic" */
+        }
+
+        #resetButton, #cancelButton {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #resetButton:hover, #cancelButton:hover {
+            background-color: #45a049;
+        }
+
+        #player_turn_front_end {
+            font-size: 1.2rem;
+            margin-top: 20px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        /* Ajout de couleurs pour les cases */
+        .empty {
+            background-color: white;
+        }
+
+        .player1 {
+            background-color: #FFCC00; /* Jaune/orange */
+        }
+
+        .player2 {
+            background-color: red;
         }
     </style>
 </head>
@@ -26,8 +97,8 @@
         {% for i in range(board|length) %}
             <tr>
                 {% for j in range(board[i]|length) %}
-                    <td onclick="updateBox({{ i }}, {{ j }})">
-                        {{ board[i][j] }}
+                    <td class="empty" onclick="updateBox({{ i }}, {{ j }})">
+                        <!-- Le contenu sera ajouté dynamiquement avec du JavaScript -->
                     </td>
                 {% endfor %}
             </tr>
@@ -38,121 +109,112 @@
 <h3 id="player_turn_front_end"></h3>
 
 <button id="resetButton" onclick="reset_board()">Reset game</button>
-<button id="cancelButton" onclick="ctrl_z()">ctrl Z move</button>
+<button id="cancelButton" onclick="ctrl_z()">ctrl Z</button>
 <button id="cancelButton" onclick="ctrl_y()">ctrl Y</button>
-
-
 
 <script>
     function ctrl_z() {
-    // Show an alert when the button is clicked
-    fetch('/ctrl_z_button_clicked', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-    })
-    .then(response => response.json())
-    .then(data => {
-        // Replace the entire board
-        updateBoard(data.board);
-        updatePlayerTurn(data.player_turn)
-    })
-}
+        fetch('/ctrl_z_button_clicked', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            updateBoard(data.board);
+            updatePlayerTurn(data.player_turn);
+        });
+    }
 
-function ctrl_y() {
-    // Show an alert when the button is clicked
-    fetch('/ctrl_y_button_clicked', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-    })
-    .then(response => response.json())
-    .then(data => {
-        // Replace the entire board
-        updateBoard(data.board);
-        updatePlayerTurn(data.player_turn)
-    })
-}
-
+    function ctrl_y() {
+        fetch('/ctrl_y_button_clicked', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            updateBoard(data.board);
+            updatePlayerTurn(data.player_turn);
+        });
+    }
 
     function reset_board() {
-    // Show an alert when the button is clicked
-    fetch('/reset_button_clicked', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-    })
-    .then(response => response.json())
-    .then(data => {
-        // Replace the entire board
-        updateBoard(data.board);
-        updatePlayerTurn(data.player_turn)
-    })
-}
+        fetch('/reset_button_clicked', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            updateBoard(data.board);
+            updatePlayerTurn(data.player_turn);
+        });
+    }
 
+    function updateBox(row, column) {
+        const data = { column: column, row: row };
+        fetch('/box_clicking', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(data => {
+            updateBoard(data.board);
+            if (data.winning_player != 0) {
+                alert("Player " + data.winning_player + " wins!");
+            }
+            updatePlayerTurn(data.player_turn);
+        });
+    }
 
-function updateBox(row, column) {
-    const data = {
-        column: column,
-        row: row
-    };
-
-    // Send POST request with coordinates
-    fetch('/box_clicking', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data) // Convert object to JSON
-    })
-    .then(response => response.json())
-    .then(data => {
-        // Replace the entire board
-        updateBoard(data.board);
-        if (data.winning_player != 0) {
-            alert("Player " + data.winning_player + " wins!");  // Show alert with the winner
-        }
-        updatePlayerTurn(data.player_turn)
-    })
-}
-
-function updateBoard(board) {
-    const table = document.getElementById('board_frontend');
-    for (let row = 0; row < board.length; row++) {
-        for (let col = 0; col < board[row].length; col++) {
-            const cell = table.rows[row].cells[col];
-            const value = board[row][col];
-            cell.textContent = '';  // Update cell with new value
-            cell.style.backgroundColor = getColorForValue(value);
+    function updateBoard(board) {
+        const table = document.getElementById('board_frontend');
+        for (let row = 0; row < board.length; row++) {
+            for (let col = 0; col < board[row].length; col++) {
+                const cell = table.rows[row].cells[col];
+                const value = board[row][col];
+                cell.className = '';  // Remove old class
+                cell.classList.add(getClassForValue(value)); // Add new class
+            }
         }
     }
-}
 
-function updatePlayerTurn(player_turn) {
-    const old_player_turn = document.getElementById('player_turn_front_end');
-    old_player_turn.textContent = "It's your turn, Player: " + player_turn;
-    old_player_turn.style.color = getColorForValue(player_turn)  
-}
+    function updatePlayerTurn(player_turn) {
+        const playerTurnElement = document.getElementById('player_turn_front_end');
+        playerTurnElement.textContent = "It's your turn, Player: " + player_turn;
+        playerTurnElement.style.color = getColorForValue(player_turn);
+    }
 
+    function getClassForValue(value) {
+        if (value == 0) {
+            return 'empty'; 
+        } else if (value == 1) {
+            return 'player1';  // Jaune/orange
+        } else if (value == 2) {
+            return 'player2';  // Rouge
+        }
+    }
 
-function getColorForValue(value) {
-    if (value == 0) {
-        return 'white'; 
-    } else if (value == 1) {
-        return '#FFCC00';  // orange yellow
-    } else if (value == 2) {
-        return 'red'; 
-    } 
-}
+    function getColorForValue(value) {
+        if (value == 0) {
+            return 'white'; 
+        } else if (value == 1) {
+            return '#FFCC00';  // Orange Jaune
+        } else if (value == 2) {
+            return 'red'; 
+        }
+    }
 
-window.onload = function() {
-    const initialBoard = {{ board|tojson }}; // Use Jinja to inject the board array from the backend
-    updateBoard(initialBoard); // Apply colors at the start
-    updatePlayerTurn('{{ player_turn }}');  // Apply the player's turn at the start
-};
+    window.onload = function() {
+        const initialBoard = {{ board|tojson }}; 
+        updateBoard(initialBoard); 
+        updatePlayerTurn('{{ player_turn }}');  
+    };
 </script>
 
 </body>
