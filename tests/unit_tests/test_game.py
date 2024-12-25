@@ -97,6 +97,46 @@ def test_check_victory(game_state):
     assert new_game_state.check_victory(player = Color.YELLOW)
     assert not new_game_state.check_victory(player = Color.RED)
 
+def test_check_if_victory_is_possible(game_state):
+    assert not game_state.check_if_victory_is_possible(player=Color.YELLOW)
+    game_state.switch_player_turn()
+    assert not game_state.check_if_victory_is_possible(player=Color.RED)
+    game_state.board
+    game_state.switch_player_turn()
+
+    new_game_state = copy.deepcopy(game_state)
+    for j in range(RECQUIRED_ALIGNED_PAWNS_TO_WIN-1):
+        new_game_state.board[NUMBER_OF_ROWS-1,j] = Color.YELLOW
+    assert new_game_state.check_if_victory_is_possible(player = Color.YELLOW)
+    new_game_state.switch_player_turn()
+    assert not new_game_state.check_if_victory_is_possible(player = Color.RED)
+
+    new_game_state = copy.deepcopy(game_state)
+    for i in range(RECQUIRED_ALIGNED_PAWNS_TO_WIN-1):
+        new_game_state.board[NUMBER_OF_ROWS-1-i,0] = Color.YELLOW
+    assert new_game_state.check_if_victory_is_possible(player = Color.YELLOW)
+    new_game_state.switch_player_turn()
+    assert not new_game_state.check_if_victory_is_possible(player = Color.RED)
+
+    new_game_state = copy.deepcopy(game_state)
+    for k in range(RECQUIRED_ALIGNED_PAWNS_TO_WIN-1):
+        new_game_state.board[NUMBER_OF_ROWS-1-k,k] = Color.YELLOW
+    assert not new_game_state.check_if_victory_is_possible(player = Color.YELLOW)
+    new_game_state.switch_player_turn()
+    assert not new_game_state.check_if_victory_is_possible(player = Color.RED)
+
+def test_is_a_deadly_move(game_state):
+    assert not game_state.is_a_deadly_move(column=0)
+    game_state.board[NUMBER_OF_ROWS-1,2] = Color.YELLOW
+    game_state.board[NUMBER_OF_ROWS-1,3] = Color.YELLOW
+    assert game_state.is_a_deadly_move(column=1)
+
+def test_check_if_exists_a_deadly_move(game_state):
+    assert not game_state.check_if_exists_a_deadly_move()
+    game_state.board[NUMBER_OF_ROWS-1,2] = Color.YELLOW
+    game_state.board[NUMBER_OF_ROWS-1,3] = Color.YELLOW
+    assert game_state.check_if_exists_a_deadly_move()
+
 def test_play_from_Game():
     game = Game()
     game.play(column=0, player_turn=Color.YELLOW)

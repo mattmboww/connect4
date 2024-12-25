@@ -78,6 +78,37 @@ class GameState:
                 if horizontal_victory or vertical_victory or diagonal_victory:
                     return True
         return False
+    
+    def check_if_victory_is_possible(self: Self, player: Color) -> bool:
+        for player_to_test in {Color.YELLOW, Color.RED}:
+            assert not self.check_victory(player_to_test) # no player is supposed to have won already
+        for column in range(NUMBER_OF_COLUMNS):   
+            game_state_copy = copy.deepcopy(self)
+            game_state_copy.play(column, player)
+            if game_state_copy.check_victory(player):
+                return True
+        return False
+    
+    def is_a_deadly_move(self: Self, column: int) -> bool:
+        potential_winner_player = self.player_turn
+        game_state_copy = copy.deepcopy(self)
+        game_state_copy.play(column, potential_winner_player)
+        opponent_player = game_state_copy.player_turn
+        for column in range(NUMBER_OF_COLUMNS):
+            new_game_state_copy = copy.deepcopy(game_state_copy)
+            new_game_state_copy.play(column, opponent_player)
+            if not new_game_state_copy.check_if_victory_is_possible(potential_winner_player):
+                return False
+        return True
+    
+    def check_if_exists_a_deadly_move(self: Self) -> bool:
+        for column in range(NUMBER_OF_COLUMNS):
+            if self.is_a_deadly_move(column):
+                return True
+        return False
+    
+
+
 
 
 class Game:
@@ -126,11 +157,4 @@ class Game:
         assert self.pointer < len(self.game_states)-1
         self.pointer += 1
         return self 
-
-    def play_and_check_victory(self: Self, column: int) -> Self:
-        current_player_turn = self.get_current_player_turn()
-        self.play(column, player_turn=current_player_turn)
-        game_state = self.get_current_game_state()
-        victory = game_state.check_victory(player=current_player_turn)
-        return self, victory
 
