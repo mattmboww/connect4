@@ -2,6 +2,7 @@ from enum import Enum, auto
 import numpy as np
 from typing import Self, List
 import copy 
+import random
 
 NUMBER_OF_ROWS = 6
 NUMBER_OF_COLUMNS = 7 
@@ -36,12 +37,11 @@ class GameState:
         else:
             return np.where(self.board[:, column] != Color.EMPTY)[0][0]
     
-    def play(self: Self, column: int, player_turn: Color) -> Self:
+    def play(self: Self, column: int) -> Self:
         assert 0 <= column < NUMBER_OF_COLUMNS
-        assert player_turn == self.player_turn
         position_of_highest_pawn = self.get_position_of_highest_pawn(column)
         assert 0 < position_of_highest_pawn 
-        self.board[position_of_highest_pawn-1][column] = player_turn
+        self.board[position_of_highest_pawn-1][column] = self.player_turn
         self.switch_player_turn()
         return self
     
@@ -84,7 +84,7 @@ class GameState:
             assert not self.check_victory(player_to_test) # no player is supposed to have won already
         for column in range(NUMBER_OF_COLUMNS):   
             game_state_copy = copy.deepcopy(self)
-            game_state_copy.play(column, player)
+            game_state_copy.play(column)
             if game_state_copy.check_victory(player):
                 return True
         return False
@@ -92,11 +92,10 @@ class GameState:
     def is_a_deadly_move(self: Self, column: int) -> bool:
         potential_winner_player = self.player_turn
         game_state_copy = copy.deepcopy(self)
-        game_state_copy.play(column, potential_winner_player)
-        opponent_player = game_state_copy.player_turn
+        game_state_copy.play(column)
         for column in range(NUMBER_OF_COLUMNS):
             new_game_state_copy = copy.deepcopy(game_state_copy)
-            new_game_state_copy.play(column, opponent_player)
+            new_game_state_copy.play(column)
             if not new_game_state_copy.check_if_victory_is_possible(potential_winner_player):
                 return False
         return True
@@ -119,14 +118,18 @@ class Game:
             self.game_states = [initial_game_state]
         self.pointer = pointer
 
-    def play(self: Self, column: int, player_turn: Color) -> Self:
+    def play(self: Self, column: int) -> Self:
         current_game_state = self.get_current_game_state()
         current_game_state = copy.deepcopy(current_game_state)
-        current_game_state.play(column, player_turn)
+        current_game_state.play(column)
         self.cut_game_states()
         self.game_states.append(current_game_state)
         self.move_pointer_forward()
         return self
+    
+    def play_randomly(self: Self) -> Self:
+        random_column = random.randint(0, NUMBER_OF_COLUMNS-1)
+        return self.play(random_column)
     
     def get_current_game_state(self: Self) -> GameState:
         assert len(self.game_states) > 0

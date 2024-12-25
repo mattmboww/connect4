@@ -156,21 +156,55 @@
     }
 
     function updateBox(row, column) {
-        const data = { column: column, row: row };
-        fetch('/box_clicking', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
+    
+    const data = { column: column, row: row };
+    
+    // Première requête : envoi du clic de la boîte
+    fetch('/human_playing', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Met à jour le plateau après la réponse de /box_clicking
+        updateBoard(data.board);
+        
+        // Si un joueur a gagné, affiche un message
+        if (data.winning_player !== 0) {
+            alert("Player " + data.winning_player + " wins!");
+        }
+
+        // Met à jour le tour du joueur
+        updatePlayerTurn(data.player_turn);
+
+        // Deuxième requête : appel à la route pour que l'ordinateur joue
+        fetch('/computer_playing', {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' }
         })
         .then(response => response.json())
         .then(data => {
+            // Met à jour le plateau après la réponse de /computer_playing
             updateBoard(data.board);
-            if (data.winning_player != 0) {
+
+            // Vérifie si l'ordinateur a gagné
+            if (data.winning_player !== 0) {
                 alert("Player " + data.winning_player + " wins!");
             }
+
+            // Met à jour le tour du joueur
             updatePlayerTurn(data.player_turn);
+        })
+        .catch(error => {
+            console.error('Error during computer play:', error);
         });
-    }
+    })
+    .catch(error => {
+        console.error('Error during box click:', error);
+    });
+}
+
 
     function updateBoard(board) {
         const table = document.getElementById('board_frontend');
