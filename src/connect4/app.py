@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, request, render_template
 
-from game import Game
+from game import Game, Color
 
 game = Game()
 game.initialize()
@@ -19,11 +19,14 @@ def receive_move():
     # Assume we receive data through the POST request
     data = request.get_json()
     column = data.get('column')
-    game.play(column, player_turn=game.player_turn)
-    board_json_compatible, player_turn_value = convert_game_to_json_compatible(game)
+    current_player_turn = game.player_turn
+    game.play(column, player_turn=current_player_turn)
+    victory = game.check_victory(player=current_player_turn)
+    new_board_json_compatible, new_player_turn_value = convert_game_to_json_compatible(game)
     response = {
-        'board':  board_json_compatible, 
-        'player_turn': player_turn_value
+        'board':  new_board_json_compatible, 
+        'player_turn': new_player_turn_value, 
+        'winning_player': current_player_turn.value if victory else Color.EMPTY.value 
     }
     return jsonify(response)  
 
@@ -34,7 +37,7 @@ from game import NUMBER_OF_COLUMNS, NUMBER_OF_ROWS, Color
 def reset_board():
     # global game 
     # game = Game(board = np.full((NUMBER_OF_ROWS, NUMBER_OF_COLUMNS), Color.EMPTY), player_turn= Color.YELLOW )
-    global game  
+    global game
     game = game.initialize()
 
     board_json_compatible, player_turn_value = convert_game_to_json_compatible(game)

@@ -8,9 +8,9 @@ RECQUIRED_ALIGNED_PAWNS_TO_WIN = 4
 
 
 class Color(Enum):
+    EMPTY = 0
     YELLOW = auto()
     RED = auto()
-    EMPTY = auto()
 
 class Game:
 
@@ -76,9 +76,3 @@ class Game:
                 if horizontal_victory or vertical_victory or diagonal_victory:
                     return True
         return False
-    
-    
-                    
-
-
-        
