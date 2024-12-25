@@ -30,12 +30,12 @@ def test_get_position_of_highest_pawn(game_state):
 
 def test_play_from_game_state(game_state):
     column = 0
-    game_state.play(column, player_turn = Color.YELLOW)
+    game_state.play(column)
     assert game_state.player_turn == Color.RED
     for i in range(NUMBER_OF_ROWS-1):
         assert game_state.board[i,column] == Color.EMPTY
     assert game_state.board[NUMBER_OF_ROWS-1,column] == Color.YELLOW
-    game_state.play(column, player_turn = Color.RED)
+    game_state.play(column)
     assert game_state.board[NUMBER_OF_ROWS-2,column] == Color.RED
     assert game_state.board[NUMBER_OF_ROWS-1,column] == Color.YELLOW
 
@@ -139,10 +139,10 @@ def test_check_if_exists_a_deadly_move(game_state):
 
 def test_play_from_Game():
     game = Game()
-    game.play(column=0, player_turn=Color.YELLOW)
-    game.play(column=1, player_turn=Color.RED)
-    game.play(column=0, player_turn=Color.YELLOW)
-    game.play(column=1, player_turn=Color.RED)
+    game.play(column=0)
+    game.play(column=1)
+    game.play(column=0)
+    game.play(column=1)
     game_states = game.game_states
     assert len(game_states) == 5
     current_game_state = game_states[-1]
