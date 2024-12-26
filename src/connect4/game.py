@@ -5,7 +5,7 @@ import copy
 import random
 
 
-from game_state import GameState, Color, NUMBER_OF_COLUMNS
+from gameState import GameState, Color, NUMBER_OF_COLUMNS
 
 class Game:
 
