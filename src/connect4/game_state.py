@@ -1,12 +1,9 @@
 from enum import Enum, auto
 import numpy as np
-from typing import Self, List
+from typing import Self, Set, List
 import copy 
-import random
 
-NUMBER_OF_ROWS = 6
-NUMBER_OF_COLUMNS = 7 
-RECQUIRED_ALIGNED_PAWNS_TO_WIN = 4
+from config import NUMBER_OF_ROWS, NUMBER_OF_COLUMNS, RECQUIRED_ALIGNED_PAWNS_TO_WIN
 
 
 class Color(Enum):
@@ -14,7 +11,6 @@ class Color(Enum):
     YELLOW = auto()
     RED = auto()
 
-    
 class GameState:
 
     def __init__(self: Self, board: np.ndarray = None, player_turn: Color = None) -> None:
@@ -25,9 +21,13 @@ class GameState:
         self.board = np.full((NUMBER_OF_ROWS, NUMBER_OF_COLUMNS), Color.EMPTY)
         self.player_turn = Color.YELLOW
         return self
+    
+    @staticmethod
+    def get_opponent(player):
+        return Color.RED if player == Color.YELLOW else Color.YELLOW
 
     def switch_player_turn(self: Self) -> Self:
-        self.player_turn = Color.RED if self.player_turn == Color.YELLOW else Color.YELLOW
+        self.player_turn = GameState.get_opponent(self.player_turn)
         return self
 
     def get_position_of_highest_pawn(self: Self, column: int) -> int:
@@ -36,9 +36,15 @@ class GameState:
             return NUMBER_OF_ROWS # convention: if no pawn in a column, lowest pawn is "in the ground"
         else:
             return np.where(self.board[:, column] != Color.EMPTY)[0][0]
+        
+    def get_possible_plays(self: Self) -> Set[int]:
+        return {column for column in range(NUMBER_OF_COLUMNS) if 0 < self.get_position_of_highest_pawn(column)}
     
+    def get_possible_futures(self: Self) -> List['GameState']:
+        return [copy.deepcopy(self).play(possible_column_to_play) for possible_column_to_play in self.get_possible_plays()]
+        
     def play(self: Self, column: int) -> Self:
-        assert 0 <= column < NUMBER_OF_COLUMNS
+        assert column in self.get_possible_plays()
         position_of_highest_pawn = self.get_position_of_highest_pawn(column)
         assert 0 < position_of_highest_pawn 
         self.board[position_of_highest_pawn-1][column] = self.player_turn
@@ -82,9 +88,13 @@ class GameState:
     def check_if_victory_is_possible(self: Self, player: Color) -> bool:
         for player_to_test in {Color.YELLOW, Color.RED}:
             assert not self.check_victory(player_to_test) # no player is supposed to have won already
-        for column in range(NUMBER_OF_COLUMNS):   
+        for column in self.get_possible_plays():   
             game_state_copy = copy.deepcopy(self)
+            game_state_copy.player_turn = player # to force player if necessary 
             game_state_copy.play(column)
+            for ligne in game_state_copy.board:
+                print(" ".join(map(str, ligne)))
+            print('done')
             if game_state_copy.check_victory(player):
                 return True
         return False
