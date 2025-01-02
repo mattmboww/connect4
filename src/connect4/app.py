@@ -1,7 +1,11 @@
 from flask import Flask, jsonify, request, render_template
 import time
 
-from game import Game, GameState, Color
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+from src.connect4.game import Game, GameState, Color
+
 
 game = Game()
 app = Flask(__name__)
