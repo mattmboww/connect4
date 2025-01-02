@@ -92,27 +92,26 @@ class GameState:
             game_state_copy = copy.deepcopy(self)
             game_state_copy.player_turn = player # to force player if necessary 
             game_state_copy.play(column)
-            for ligne in game_state_copy.board:
-                print(" ".join(map(str, ligne)))
-            print('done')
             if game_state_copy.check_victory(player):
                 return True
         return False
     
-    def is_a_deadly_move(self: Self, column: int) -> bool:
-        potential_winner_player = self.player_turn
+    def is_a_deadly_move(self: Self, column: int, player: Color) -> bool:
         game_state_copy = copy.deepcopy(self)
+        game_state_copy.player_turn = player
         game_state_copy.play(column)
         for column in range(NUMBER_OF_COLUMNS):
             new_game_state_copy = copy.deepcopy(game_state_copy)
             new_game_state_copy.play(column)
-            if not new_game_state_copy.check_if_victory_is_possible(potential_winner_player):
+            if new_game_state_copy.check_victory(GameState.get_opponent(player)):
+                return False # if opponent can just win the game, we did not make a deadly move...
+            if not new_game_state_copy.check_if_victory_is_possible(player):
                 return False
         return True
     
-    def check_if_exists_a_deadly_move(self: Self) -> bool:
+    def check_if_exists_a_deadly_move(self: Self, player: Color) -> bool:
         for column in range(NUMBER_OF_COLUMNS):
-            if self.is_a_deadly_move(column):
+            if self.is_a_deadly_move(column, player):
                 return True
         return False
     
