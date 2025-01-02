@@ -4,8 +4,7 @@ from typing import Self, List
 import copy 
 import random
 
-
-from gameState import GameState, Color, NUMBER_OF_COLUMNS
+from src.connect4.game_state import GameState, Color, NUMBER_OF_COLUMNS
 
 class Game:
 
