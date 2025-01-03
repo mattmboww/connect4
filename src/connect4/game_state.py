@@ -67,11 +67,19 @@ class GameState:
                 return False
         return True
 
-    def check_diagonal_victory(self: Self, i: int, j: int, player: Color) -> bool: # (moving to the top/right)
+    def check_diagonal_victory_up_right(self: Self, i: int, j: int, player: Color) -> bool: # (moving to the top/right)
         for k in range(RECQUIRED_ALIGNED_PAWNS_TO_WIN):
             if i-k > NUMBER_OF_ROWS-1 or j+k > NUMBER_OF_COLUMNS-1: # reached end of the board
                 return False
             if self.board[i-k][j+k] != player: # found a different color than player's color
+                return False
+        return True
+    
+    def check_diagonal_victory_down_right(self: Self, i: int, j: int, player: Color) -> bool: # (moving to the top/right)
+        for k in range(RECQUIRED_ALIGNED_PAWNS_TO_WIN):
+            if i+k > NUMBER_OF_ROWS-1 or j+k > NUMBER_OF_COLUMNS-1: # reached end of the board
+                return False
+            if self.board[i+k][j+k] != player: # found a different color than player's color
                 return False
         return True
     
@@ -80,8 +88,9 @@ class GameState:
             for j in range(NUMBER_OF_COLUMNS):
                 horizontal_victory = self.check_horizontal_victory(i, j, player)
                 vertical_victory = self.check_vertical_victory(i, j, player)
-                diagonal_victory = self.check_diagonal_victory(i, j, player)
-                if horizontal_victory or vertical_victory or diagonal_victory:
+                diagonal_victory_up_right = self.check_diagonal_victory_up_right(i, j, player)
+                diagonal_victory_down_right = self.check_diagonal_victory_down_right(i, j, player)
+                if horizontal_victory or vertical_victory or diagonal_victory_up_right or diagonal_victory_down_right:
                     return True
         return False
     
