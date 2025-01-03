@@ -2,7 +2,11 @@ import pytest
 import numpy as np
 import copy 
 
-from connect4.game import Game, GameState, Color, NUMBER_OF_ROWS, NUMBER_OF_COLUMNS
+from src.connect4.game_state import GameState, Color
+from src.connect4.game import Game
+
+from config import NUMBER_OF_ROWS, NUMBER_OF_COLUMNS
+
 
 @pytest.fixture
 def game_state():
