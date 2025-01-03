@@ -41,6 +41,37 @@ class GameStateTree:
 
         return all_subtrees
     
+    def to_networkx_graph(self) -> nx.DiGraph:
+        """
+        Convert the GameStateTree to a networkx graph, where each node's name is
+        the memory address of the subtree (id()), and edges represent parent-child relationships.
+        """
+        graph = nx.DiGraph()
+        def add_subtree_to_graph(tree: 'GameStateTree', matching_tree_and_id):
+            node_id = id(tree)
+            graph.add_node(node_id)  # Add the node
+            # Add edges for children
+            matching_tree_and_id[node_id] = tree
+            for child in tree.children_game_state_trees:
+                child_id = id(child)
+                graph.add_node(child_id)  # Ensure the child is added as a node
+                graph.add_edge(node_id, child_id)  # Add an edge from parent to child
+                matching_tree_and_id[child_id] = child
+                # Recursively add the child's subtrees
+                add_subtree_to_graph(child, matching_tree_and_id)
+            return matching_tree_and_id
+
+        matching_tree_and_id = add_subtree_to_graph(self, matching_tree_and_id={})
+        return graph, matching_tree_and_id
+    
+    def plot(self: Self) -> None:
+        graph, matching_node_id_to_subtree = self.to_networkx_graph()
+        pos = nx.spring_layout(graph, seed=42, k=0.5, iterations=50)  
+        labels = {index: matching_node_id_to_subtree[index].value for index in matching_node_id_to_subtree}
+        nx.draw(graph, pos, with_labels=True, labels=labels, node_size=300, node_color="skyblue", font_size=10, font_weight='bold', edge_color='gray')
+        plt.title("Graph of GameStateTree")
+        plt.show()
+
     def get_all_leaves(self: Self) -> List['GameStateTree']:
         return [node['game_state_tree'] for node in self.get_all_subtrees() if node['game_state_tree'].is_leaf()]
         
