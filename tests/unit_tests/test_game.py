@@ -1,10 +1,8 @@
 import pytest
 import numpy as np
-import copy 
 
-from connect4.game import Game, Color
-from connect4.gameState import NUMBER_OF_ROWS
-
+from src.connect4.game import Game, Color
+from src.connect4.game_state import NUMBER_OF_ROWS
 
 def test_play_from_Game():
     game = Game()

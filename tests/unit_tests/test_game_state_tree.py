@@ -5,6 +5,8 @@ import copy
 from src.connect4.game_state_tree import GameStateTree
 from src.connect4.game_state import GameState, Color
 from config import NUMBER_OF_COLUMNS, NUMBER_OF_ROWS
+from src.connect4.value_functions import dummy_value_function, bipolar_value_function
+from src.connect4.make_decision import compute_game_state_tree_value
 
 @pytest.fixture
 def game_state_tree(): # a simple game_state_tree made of an initial empty board with and 2 leaves

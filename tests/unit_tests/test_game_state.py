@@ -2,7 +2,8 @@ import pytest
 import numpy as np
 import copy 
 
-from connect4.game_state import GameState, Color, NUMBER_OF_ROWS, NUMBER_OF_COLUMNS, RECQUIRED_ALIGNED_PAWNS_TO_WIN
+from src.connect4.game_state import GameState, Color, NUMBER_OF_ROWS, NUMBER_OF_COLUMNS, RECQUIRED_ALIGNED_PAWNS_TO_WIN
+
 
 @pytest.fixture
 def game_state():
