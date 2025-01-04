@@ -24,7 +24,7 @@ class Game:
         return self
     
     def play_randomly(self: Self) -> Self:
-        random_column = random.randint(0, NUMBER_OF_COLUMNS-1)
+        random_column = random.choice((0, NUMBER_OF_COLUMNS-1)) #   pas bon, devrait etre dans possible plays plutot
         return self.play(random_column)
     
     def get_current_game_state(self: Self) -> GameState:

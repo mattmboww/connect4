@@ -2,6 +2,12 @@ from typing import Self, List
 import copy
 
 from src.connect4.game_state import GameState, Color
+from typing import List, Optional
+
+import matplotlib.pyplot as plt
+import networkx as nx
+
+print(nx.__version__)
 
 class GameStateTree:
 
@@ -89,8 +95,8 @@ class GameStateTree:
                 return some_node['father']
     
     def extend_from_root(self: Self) -> Self:
-        possible_futures = self.current_game_state.get_possible_futures()
-        self.children_game_state_trees = [GameStateTree(possible_future, []) for possible_future in possible_futures]
+        possible_future_game_state = list(self.current_game_state.get_possible_futures().values())
+        self.children_game_state_trees = [GameStateTree(possible_future, []) for possible_future in possible_future_game_state]
         return self
     
     def extend(self: Self, depth: int) -> Self:
@@ -100,36 +106,12 @@ class GameStateTree:
                 leaf.extend_from_root()
         return self
     
-    def compute_game_state_tree_value(self: Self, value_function: 'function', player: Color) -> float:
-        all_subtrees = [subtree['game_state_tree'] for subtree in self.get_all_subtrees()]
-        while self.value is None:
-            for subtree in all_subtrees:
-                subtree_children_values = [subtree_child.value for subtree_child in subtree.children_game_state_trees]
-                if subtree.is_leaf():
-                    subtree.value = value_function(subtree.current_game_state, player)
-                elif all([isinstance(subtree_children_value, float) for subtree_children_value in subtree_children_values]):
-                    subtree.value = max(subtree_children_values) if subtree.current_game_state.player_turn == player else min(subtree_children_values)
-                else:
-                    pass   
-                if subtree==self:
-                    print('self')
-                else:
-                    print('child')
-                print(subtree.current_game_state.board)
-                print('subtree: ', subtree.value)
-                print('subtree: ', subtree.current_game_state.player_turn)
-                print('self: ', self.value)
-      
-        return self.value
-    
     @staticmethod
-    def compute_game_state_value(game_state: GameState, value_function: 'function', player: Color, depth) -> float:
-        game_state_tree = GameStateTree(game_state)
-        game_state_tree.extend(depth)
-
-        return game_state_tree.compute_game_state_tree_value(value_function, player)
-        
+    def generate_tree_from_game_state(game_state: GameState, depth:int) -> 'GameStateTree':
+        return GameStateTree(game_state).extend(depth)
     
-# je parcours les noeuds tant que le pere n'a pas de valeur
-# si j'ai un noeud sans enfant, ou si tous ses enfants ont une valeur, je calcule la valeur de mon noeud
-# on continue jusqu'à tout avoir
+    def reinitialize_all_values(self: Self) -> Self:
+        for subtree in self.get_all_subtrees():
+            subtree['game_state_tree'].value = None
+    
+ 

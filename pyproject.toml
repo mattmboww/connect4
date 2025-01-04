@@ -5,7 +5,7 @@ description = "Default template for PDM package"
 authors = [
     {name = "Matthieu Mbarga Owona", email = "matthieu.mbargaowona@gmail.com"},
 ]
-dependencies = ["numpy>=2.2.1", "typing>=3.7.4.3", "pytest>=8.3.4"]
+dependencies = ["numpy>=2.2.1", "typing>=3.7.4.3", "pytest>=8.3.4", "flask>=3.1.0", "jsonify>=0.5", "graphviz>=0.20.3", "networkx>=3.4.2", "matplotlib>=3.10.0", "scipy>=1.14.1"]
 requires-python = "==3.13.0"
 readme = "README.md"
 license = {text = "MIT"}
@@ -17,4 +17,5 @@ distribution = false
 [dependency-groups]
 dev = [
     "pytest>=8.3.4",
+    "pytest-cov>=6.0.0",
 ]
