@@ -7,8 +7,6 @@ from typing import List, Optional
 import matplotlib.pyplot as plt
 import networkx as nx
 
-print(nx.__version__)
-
 class GameStateTree:
 
     def __init__(self: Self, 

@@ -26,6 +26,7 @@ class GameState:
     
     @staticmethod
     def get_opponent(player):
+        assert player != Color.EMPTY
         return Color.RED if player == Color.YELLOW else Color.YELLOW
 
     def switch_player_turn(self: Self) -> Self:
@@ -93,41 +94,22 @@ class GameState:
                 return True
         return False
     
-    def check_new_diagonal_victory_down_right(self: Self, i: int, last_column_played: int, player):
-        for k in range(RECQUIRED_ALIGNED_PAWNS_TO_WIN):
-            if i+k > NUMBER_OF_ROWS-1:
-                continue
-            if self.check_diagonal_victory_down_right(i+k, last_column_played+k, player):
-                return True
-        return False
-    
     def check_new_diagonal_victory_up_right(self: Self, i: int, last_column_played: int, player):
         for k in range(RECQUIRED_ALIGNED_PAWNS_TO_WIN):
-            if i - k < 0 or last_column_played+k > NUMBER_OF_COLUMNS-1:
+            if i + k > NUMBER_OF_ROWS or last_column_played-k <0:
                 continue
-            if self.check_diagonal_victory_up_right(i-k, last_column_played+k, player):
+            if self.check_diagonal_victory_up_right(i+k, last_column_played-k, player):
                 return True
         return False
     
     def check_new_diagonal_victory_down_right(self: Self, i: int, last_column_played: int, player):
         for k in range(RECQUIRED_ALIGNED_PAWNS_TO_WIN):
-            if i + k < NUMBER_OF_ROWS-1 or last_column_played+k > NUMBER_OF_COLUMNS-1:
+            if i - k < 0 or last_column_played-k < 0:
                 continue
-            if self.check_vertical_victory(i-k, last_column_played-k, player):
+            if self.check_diagonal_victory_down_right(i-k, last_column_played-k, player):
                 return True
         return False
-    
-    def check_victory(self: Self, player: Color) -> bool:
-        for i in range(NUMBER_OF_ROWS):
-            for j in range(NUMBER_OF_COLUMNS):
-                horizontal_victory = self.check_horizontal_victory(i, j, player)
-                vertical_victory = self.check_vertical_victory(i, j, player)
-                diagonal_victory_up_right = self.check_diagonal_victory_up_right(i, j, player)
-                diagonal_victory_down_right = self.check_diagonal_victory_down_right(i, j, player)
-                if horizontal_victory or vertical_victory or diagonal_victory_up_right or diagonal_victory_down_right:
-                    return True
-        return False
-    
+
     def check_new_victory(self: Self, last_column_played: int, player: Color) -> bool:
         i = self.get_position_of_highest_pawn(last_column_played)
         if i==NUMBER_OF_ROWS:
@@ -136,7 +118,7 @@ class GameState:
         if self.check_new_horizontal_victory(i,last_column_played, player):
             return True
         
-        if self.check_diagonal_victory_up_right(i, last_column_played, player):
+        if self.check_new_diagonal_victory_up_right(i, last_column_played, player):
             return True
     
         if self.check_new_diagonal_victory_down_right(i, last_column_played, player):
@@ -148,16 +130,12 @@ class GameState:
         return False
     
     def check_if_victory_is_possible(self: Self, player: Color) -> bool:
-        # for player_to_test in {Color.YELLOW, Color.RED}:
-        #     assert not self.check_victory(player_to_test) # no player is supposed to have won already
         for column in self.get_possible_plays():   
             game_state_copy = copy.deepcopy(self)
             game_state_copy.player_turn = player # to force player if necessary 
             game_state_copy.play(column)
             if game_state_copy.check_new_victory(last_column_played=column, player=player):
                 return True   
-            # if game_state_copy.check_victory(player):
-                # return True
         return False
     
     def is_a_deadly_move(self: Self, column: int, player: Color) -> bool:
@@ -184,7 +162,6 @@ class GameState:
     def is_full_board(self: Self) -> bool:
         return np.all(self.board != Color.EMPTY) 
         
-
     def plot(self: Self)-> None:
         board_copy = copy.deepcopy(self.board)
         value_array = np.vectorize(lambda status: status.value)(board_copy)
@@ -194,3 +171,19 @@ class GameState:
         plt.colorbar(label="Valeur")
         plt.title("Visualisation avec Colormap personnalisée")
         plt.show()
+
+    def is_included_in(self: Self, other_game_state) -> bool:
+        for i in range(self.board.shape[0]): 
+            for j in range(self.board.shape[1]):  
+                if self.board[i,j] == Color.EMPTY:
+                    continue
+                if self.board[i,j] != other_game_state.board[i,j]:
+                    return False
+        return True
+    
+    def is_equal(self, other_game_state) -> bool:
+        for i in range(self.board.shape[0]): 
+            for j in range(self.board.shape[1]):  
+                if self.board[i,j] != other_game_state.board[i,j]:
+                    return False
+        return True

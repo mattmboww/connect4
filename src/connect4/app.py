@@ -7,7 +7,8 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 from src.connect4.game import Game, GameState, Color
 
-from src.connect4.make_decision import make_scientific_decision_with_depth
+from src.connect4.make_decision import make_decision_with_science, evaluate_a_move_with_science,make_decision, make_decision_with_history
+from src.connect4.moves_sequence import load_moves_sequences_from_pickle
 
 
 game = Game()
@@ -15,10 +16,17 @@ app = Flask(__name__)
 is_thinking_computer = False 
 game_over = False
 
+
 # configuration parameters
 PVE = True
 WAITING_TIME = 0 # secs
-COMPUTER_VISION_DEPTH = 2
+
+input_path = '/Users/matthieumbargaowona/Desktop/4FVN/connect4/output/moves_sequences/my_simulations.pkl'
+# dumb est super long a utiliser pour predire pour l'instant car il y a tous les coups possibles a checher (environ 12 sec)
+
+moves_sequences = load_moves_sequences_from_pickle(input_path)
+
+
 # with 0 and not V2: it seems it makes pretty good decisions, wiht more... ?
 
 def convert_game_state_to_json_compatible(game_state: GameState = GameState()):
@@ -51,19 +59,33 @@ def make_move(action: dict):
             game.play(decision)
         case 'play_scientific_decision':
             current_game_state = game.get_current_game_state()
-            decision = make_scientific_decision_with_depth(current_game_state,
-                                                player=current_player_turn, 
-                                                use_random=False, 
-                                                depth=COMPUTER_VISION_DEPTH
-                                                )
+            # decision = make_decision_with_science(current_game_state,
+            #                                     player=current_player_turn, 
+            #                                     move_evaluation_function=evaluate_a_move_with_science,
+            #                                     use_random=False
+            #                                     )
+            global moves_sequences
+            # decision = make_decision_with_history(current_game_state, 
+            #                                       player=current_player_turn,
+            #                                       moves_sequences=moves_sequences, 
+            #                                       use_random=True)
+            decision = make_decision(current_game_state, 
+                                                  player=current_player_turn,
+                                                  move_evaluation_function=evaluate_a_move_with_science,
+                                                  moves_sequences=moves_sequences, 
+                                                  use_random=True)
             game.play(decision)
+            # TODO : afficher la valeur du gamestate générés par l'ordi (selon lui) dans l'interface graphique 
         case 'pass':
-            pass
+            decision = None
         case _:
             raise ValueError('What the heck?!')
 
     response = generate_response_from_game(game)
-    game_over =  game.get_current_game_state().check_new_victory(decision, player=current_player_turn)
+
+    if not decision is None:
+        game_over = game.get_current_game_state().check_new_victory(decision, player=current_player_turn)
+    
     response['winning_player'] = current_player_turn.value if game_over else Color.EMPTY.value
 
     return response

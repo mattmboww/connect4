@@ -121,28 +121,6 @@ def test_check_new_diagonal_victory_up_right(game_state):
     assert not game_state.check_new_diagonal_victory_up_right(NUMBER_OF_ROWS-1, 1, player=Color.YELLOW)
     assert not game_state.check_new_diagonal_victory_up_right(NUMBER_OF_ROWS-1, NUMBER_OF_COLUMNS-1, player=Color.YELLOW)
 
-def test_check_victory(game_state):
-    assert not game_state.check_victory(player = Color.YELLOW)
-    assert not game_state.check_victory(player = Color.RED)
-
-    new_game_state = copy.deepcopy(game_state)
-    for j in range(RECQUIRED_ALIGNED_PAWNS_TO_WIN):
-        new_game_state.board[NUMBER_OF_ROWS-1,j] = Color.YELLOW
-    assert new_game_state.check_victory(player = Color.YELLOW)
-    assert not new_game_state.check_victory(player = Color.RED)
-
-    new_game_state = copy.deepcopy(game_state)
-    for i in range(RECQUIRED_ALIGNED_PAWNS_TO_WIN):
-        new_game_state.board[NUMBER_OF_ROWS-1-i,0] = Color.YELLOW
-    assert new_game_state.check_victory(player = Color.YELLOW)
-    assert not new_game_state.check_victory(player = Color.RED)
-
-    new_game_state = copy.deepcopy(game_state)
-    for k in range(RECQUIRED_ALIGNED_PAWNS_TO_WIN):
-        new_game_state.board[NUMBER_OF_ROWS-1-k,k] = Color.YELLOW
-    assert new_game_state.check_victory(player = Color.YELLOW)
-    assert not new_game_state.check_victory(player = Color.RED)
-
 def test_check_new_victory(game_state):
     assert not game_state.check_new_victory(last_column_played=0, player = Color.YELLOW)
     assert not game_state.check_new_victory(last_column_played=0, player = Color.RED)
@@ -159,11 +137,11 @@ def test_check_new_victory(game_state):
     assert new_game_state.check_new_victory(last_column_played=0, player = Color.YELLOW)
     assert not new_game_state.check_new_victory(last_column_played=0, player = Color.RED)
 
-    # new_game_state = copy.deepcopy(game_state)
-    # for k in range(RECQUIRED_ALIGNED_PAWNS_TO_WIN):
-    #     new_game_state.board[NUMBER_OF_ROWS-1-k,k] = Color.YELLOW
-    # assert new_game_state.check_new_victory(player = Color.YELLOW)
-    # assert not new_game_state.check_new_victory(player = Color.RED)
+    new_game_state = copy.deepcopy(game_state)
+    for k in range(RECQUIRED_ALIGNED_PAWNS_TO_WIN):
+        new_game_state.board[NUMBER_OF_ROWS-1-k,k] = Color.YELLOW
+    assert new_game_state.check_new_victory(last_column_played=k, player = Color.YELLOW)
+    assert not new_game_state.check_new_victory(last_column_played=k, player = Color.RED)
 
 def test_check_if_victory_is_possible(game_state):
     assert not game_state.check_if_victory_is_possible(player=Color.YELLOW)

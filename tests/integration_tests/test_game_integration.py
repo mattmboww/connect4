@@ -30,6 +30,20 @@ def test_quick_game_stateplay(game_state):
     game_state.play(column = 0)
     game_state.play(column = 3)
     game_state.play(column = 0)
-    assert game_state.check_victory(Color.YELLOW)
-    assert not game_state.check_victory(Color.RED)
+    assert game_state.check_new_victory(last_column_played= 0, player=Color.YELLOW)
+    assert not game_state.check_new_victory(last_column_played = 0, player=Color.RED)
 
+def test_is_equal(game_state):
+    assert game_state.is_equal(game_state)
+    game_state_copy = copy.deepcopy(game_state)
+    game_state.play(column = 3)
+    assert not game_state.is_equal(game_state_copy)
+    assert GameState().initialize().is_equal(GameState().initialize())
+
+def test_is_included(game_state):
+    game_state.play(column = 0)
+    game_state_copy = copy.deepcopy(game_state)
+    game_state.play(column = 3)
+    assert game_state_copy.is_included_in(game_state_copy)
+    assert game_state_copy.is_included_in(game_state)
+    assert not game_state.is_included_in(game_state_copy)
